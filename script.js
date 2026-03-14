@@ -10,7 +10,7 @@ const initData = tg.initData;
 // 🎮 Кнопка "В Бой!"
 document.getElementById('start-btn').addEventListener('click', async () => {
     tg.HapticFeedback.impactOccurred('heavy');
-    tg.MainButton.setText('⚔️ НАЧИНАЕМ БОЙ...');
+    tg.MainButton.setText('⚔️ ПОДКЛЮЧЕНИЕ...');
     tg.MainButton.show();
     
     try {
@@ -26,28 +26,29 @@ document.getElementById('start-btn').addEventListener('click', async () => {
         const data = await response.json();
         
         if (data.success) {
-            tg.MainButton.setText(`✅ УСПЕХ! Баланс: ${data.balance} 💰`);
+            tg.MainButton.setText(`✅ УСПЕХ!`);
             document.getElementById('game-area').innerHTML = `
                 <h2>🎁 Добро пожаловать, ${tg.initDataUnsafe.user?.first_name}!</h2>
                 <p>💰 Ваш баланс: ${data.balance} монет</p>
-                <button onclick="startBattle()">⚔️ Начать бой</button>
+                <button onclick="startBattle()" style="margin-top: 20px;">⚔️ Начать бой</button>
             `;
+            setTimeout(() => tg.MainButton.hide(), 2000);
         } else {
             tg.MainButton.setText('❌ ОШИБКА');
             alert('Ошибка: ' + data.error);
         }
     } catch (error) {
         console.error('Error:', error);
-        tg.MainButton.setText('❌ ОШИБКА СОЕДИНЕНИЯ');
+        tg.MainButton.setText('❌ ОШИБКА');
         alert('Не удалось подключиться к серверу');
     }
-    
-    setTimeout(() => tg.MainButton.hide(), 3000);
 });
 
 // ⚔️ Функция начала боя
 async function startBattle() {
     tg.HapticFeedback.impactOccurred('medium');
+    tg.MainButton.setText('⚔️ БОЙ ИДЁТ...');
+    tg.MainButton.show();
     
     try {
         const response = await fetch(`${API_URL}/api/battle`, {
@@ -65,11 +66,16 @@ async function startBattle() {
         const data = await response.json();
         
         if (data.success) {
+            tg.MainButton.setText(`🏆 ПОБЕДА!`);
             alert(`⚔️ ПОБЕДА!\n💥 Урон: ${data.battle.damage}\n🏆 Награда: ${data.battle.reward} монет`);
+        } else {
+            alert('❌ Поражение...');
         }
     } catch (error) {
         alert('Ошибка боя: ' + error.message);
     }
+    
+    setTimeout(() => tg.MainButton.hide(), 2000);
 }
 
 // Показываем информацию о пользователе
