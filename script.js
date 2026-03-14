@@ -1,21 +1,19 @@
 const tg = window.Telegram.WebApp;
 tg.expand();
 
-// 🔗 URL вашего бэкенда (БЕЗ ПРОБЕЛОВ!)
 const API_URL = 'https://anagranrulitbaby-production.up.railway.app';
-
-// Получаем initData для авторизации
 const initData = tg.initData;
 
-// 🎮 Кнопка "В Бой!"
 document.getElementById('start-btn').addEventListener('click', async () => {
-    tg.HapticFeedback.impactOccurred('heavy');
+    // 🔥 ПРОВЕРКА: если это сработает — код выполняется!
+    alert('🎯 КНОПКА НАЖАТА! Код работает.');
+    
     tg.MainButton.setText('⚔️ ПОДКЛЮЧЕНИЕ...');
     tg.MainButton.show();
     
-    console.log('📡 Отправка запроса на:', `${API_URL}/api/start`);
-    
     try {
+        console.log('📡 Запрос на:', `${API_URL}/api/start`);
+        
         const response = await fetch(`${API_URL}/api/start`, {
             method: 'POST',
             headers: {
@@ -24,63 +22,19 @@ document.getElementById('start-btn').addEventListener('click', async () => {
             }
         });
         
-        console.log('📥 Ответ сервера:', response.status);
+        console.log('📥 Статус:', response.status);
         const data = await response.json();
-        console.log('📦 Данные:', data);
+        console.log('📦 Ответ:', data);
         
         if (data.success) {
-            tg.MainButton.setText(`✅ УСПЕХ!`);
-            document.getElementById('game-area').innerHTML = `
-                <h2>🎁 Добро пожаловать, ${tg.initDataUnsafe.user?.first_name}!</h2>
-                <p>💰 Ваш баланс: ${data.balance} монет</p>
-                <button onclick="startBattle()" style="margin-top: 20px;">⚔️ Начать бой</button>
-            `;
-            setTimeout(() => tg.MainButton.hide(), 2000);
+            alert(`✅ УСПЕХ! Баланс: ${data.balance}`);
         } else {
-            tg.MainButton.setText('❌ ОШИБКА');
-            alert('Ошибка: ' + data.error);
+            alert('❌ Ошибка: ' + JSON.stringify(data));
         }
     } catch (error) {
         console.error('❌ Error:', error);
-        tg.MainButton.setText('❌ ОШИБКА');
-        alert('Не удалось подключиться к серверу: ' + error.message);
+        alert('❌ ОШИБКА: ' + error.message);
     }
+    
+    tg.MainButton.hide();
 });
-
-// ⚔️ Функция начала боя
-async function startBattle() {
-    tg.HapticFeedback.impactOccurred('medium');
-    tg.MainButton.setText('⚔️ БОЙ ИДЁТ...');
-    tg.MainButton.show();
-    
-    try {
-        const response = await fetch(`${API_URL}/api/battle`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'x-telegram-init-data': initData
-            },
-            body: JSON.stringify({
-                enemyId: null,
-                weapon: 'sword'
-            })
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            tg.MainButton.setText(`🏆 ПОБЕДА!`);
-            alert(`⚔️ ПОБЕДА!\n💥 Урон: ${data.battle.damage}\n🏆 Награда: ${data.battle.reward} монет`);
-        } else {
-            alert('❌ Поражение...');
-        }
-    } catch (error) {
-        alert('Ошибка боя: ' + error.message);
-    }
-    
-    setTimeout(() => tg.MainButton.hide(), 2000);
-}
-
-// Показываем информацию о пользователе
-const userName = tg.initDataUnsafe.user?.first_name || 'Игрок';
-document.getElementById('user-info').innerText = `Игрок: ${userName}`;
