@@ -1,7 +1,7 @@
 const tg = window.Telegram.WebApp;
 tg.expand();
 
-// 🔗 URL вашего бэкенда
+// 🔗 URL вашего бэкенда (БЕЗ ПРОБЕЛОВ!)
 const API_URL = 'https://anagranrulitbaby-production.up.railway.app';
 
 // Получаем initData для авторизации
@@ -13,8 +13,9 @@ document.getElementById('start-btn').addEventListener('click', async () => {
     tg.MainButton.setText('⚔️ ПОДКЛЮЧЕНИЕ...');
     tg.MainButton.show();
     
+    console.log('📡 Отправка запроса на:', `${API_URL}/api/start`);
+    
     try {
-        // 📡 Отправляем запрос на сервер
         const response = await fetch(`${API_URL}/api/start`, {
             method: 'POST',
             headers: {
@@ -23,7 +24,9 @@ document.getElementById('start-btn').addEventListener('click', async () => {
             }
         });
         
+        console.log('📥 Ответ сервера:', response.status);
         const data = await response.json();
+        console.log('📦 Данные:', data);
         
         if (data.success) {
             tg.MainButton.setText(`✅ УСПЕХ!`);
@@ -38,9 +41,9 @@ document.getElementById('start-btn').addEventListener('click', async () => {
             alert('Ошибка: ' + data.error);
         }
     } catch (error) {
-        console.error('Error:', error);
+        console.error('❌ Error:', error);
         tg.MainButton.setText('❌ ОШИБКА');
-        alert('Не удалось подключиться к серверу');
+        alert('Не удалось подключиться к серверу: ' + error.message);
     }
 });
 
